@@ -8,13 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic Grass Background
     // ===================================
 
-    const grassContainer = document.getElementById('grassContainer');
-
-    if (grassContainer) {
-        // Generate grass blades with varying properties for realistic effect
-        const grassCount = window.innerWidth > 768 ? 150 : 80; // Fewer blades on mobile
-
-        for (let i = 0; i < grassCount; i++) {
+    // Function to generate grass blades in a container
+    function generateGrass(container, count) {
+        for (let i = 0; i < count; i++) {
             const blade = document.createElement('div');
             blade.className = 'grass-blade';
 
@@ -52,28 +48,58 @@ document.addEventListener('DOMContentLoaded', () => {
             const width = 6 + Math.random() * 4; // 6-10px
             blade.style.width = `${width}px`;
 
-            grassContainer.appendChild(blade);
+            container.appendChild(blade);
+        }
+    }
+
+    // Hero section grass
+    const heroGrass = document.getElementById('grassContainer');
+    if (heroGrass) {
+        const heroCount = window.innerWidth > 768 ? 150 : 80;
+        generateGrass(heroGrass, heroCount);
+    }
+
+    // Generate grass for all section containers
+    const grassContainers = document.querySelectorAll('.grass-container[data-grass-section]');
+    grassContainers.forEach(container => {
+        const section = container.getAttribute('data-grass-section');
+        let count;
+
+        // Different grass densities for different sections
+        if (window.innerWidth > 768) {
+            count = section === 'services' || section === 'testimonials' ? 120 : 80;
+        } else {
+            count = section === 'services' || section === 'testimonials' ? 60 : 40;
         }
 
-        // Add wind gust effect - occasionally increase sway
-        setInterval(() => {
-            const blades = grassContainer.querySelectorAll('.grass-blade');
-            const gustIntensity = 1.5 + Math.random(); // 1.5-2.5x normal
+        generateGrass(container, count);
+    });
 
-            blades.forEach(blade => {
-                const currentAmount = parseFloat(blade.style.getPropertyValue('--sway-amount'));
-                blade.style.setProperty('--sway-amount', `${currentAmount * gustIntensity}deg`);
-            });
-
-            // Reset after gust
-            setTimeout(() => {
-                blades.forEach(blade => {
-                    const baseAmount = 2 + Math.random() * 6;
-                    blade.style.setProperty('--sway-amount', `${baseAmount}deg`);
-                });
-            }, 2000);
-        }, 8000); // Gust every 8 seconds
+    // Fixed grass strip at bottom
+    const grassStrip = document.getElementById('grassStripFixed');
+    if (grassStrip) {
+        const stripCount = window.innerWidth > 768 ? 100 : 50;
+        generateGrass(grassStrip, stripCount);
     }
+
+    // Add wind gust effect - affects ALL grass blades on the page
+    setInterval(() => {
+        const allBlades = document.querySelectorAll('.grass-blade');
+        const gustIntensity = 1.5 + Math.random(); // 1.5-2.5x normal
+
+        allBlades.forEach(blade => {
+            const currentAmount = parseFloat(blade.style.getPropertyValue('--sway-amount'));
+            blade.style.setProperty('--sway-amount', `${currentAmount * gustIntensity}deg`);
+        });
+
+        // Reset after gust
+        setTimeout(() => {
+            allBlades.forEach(blade => {
+                const baseAmount = 2 + Math.random() * 6;
+                blade.style.setProperty('--sway-amount', `${baseAmount}deg`);
+            });
+        }, 2000);
+    }, 8000); // Gust every 8 seconds
 
     // Smooth scrolling for all navigation links
     const navLinks = document.querySelectorAll('a[href^="#"]');
